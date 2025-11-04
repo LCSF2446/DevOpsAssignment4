@@ -1,0 +1,30 @@
+name: Flask Docker CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Create .env from GitHub Secrets
+        run: |
+          echo "APP_MESSAGE=${{ secrets.APP_MESSAGE }}" >> .env
+          echo "APP_HEALTH=${{ secrets.APP_HEALTH }}" >> .env
+
+      - name: Debug .env
+        run: cat .env
+
+      - name: Build and run Docker container
+        run: |
+          docker compose up --build -d
